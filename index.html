@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Translate & Learn 🌟</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  font-family: 'Tajawal', sans-serif;
+  padding: 1rem;
+}
+.container { max-width: 680px; margin: 0 auto; }
+
+header {
+  text-align: center;
+  padding: 1.5rem 0 1rem;
+  color: white;
+}
+.logo { font-size: 3rem; margin-bottom: 0.3rem; }
+h1 { font-size: 1.8rem; font-weight: 900; margin-bottom: 0.3rem; }
+.sub { font-size: 0.95rem; opacity: 0.85; }
+
+.search-box {
+  background: white;
+  border-radius: 20px;
+  padding: 1rem;
+  margin: 1rem 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+.search-row { display: flex; gap: 0.5rem; }
+input {
+  flex: 1;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  direction: rtl;
+  transition: border-color 0.2s;
+}
+input:focus { border-color: #667eea; }
+.btn-search {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0 1.2rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.btn-search:hover { transform: scale(1.05); }
+
+.categories {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+.cat-btn {
+  background: #f3f0ff;
+  border: 2px solid #c4b5fd;
+  border-radius: 100px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  font-family: inherit;
+  color: #5b21b6;
+  transition: all 0.2s;
+}
+.cat-btn:hover, .cat-btn.active {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+}
+
+/* Result card */
+.result-card {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  display: none;
+  animation: pop 0.3s ease;
+}
+@keyframes pop {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.result-emoji { font-size: 4rem; text-align: center; margin-bottom: 0.5rem; }
+.result-en {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #667eea;
+  text-align: center;
+  direction: ltr;
+  margin-bottom: 0.25rem;
+}
+.result-ar {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #333;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.result-pron {
+  text-align: center;
+  font-family: monospace;
+  color: #888;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  direction: ltr;
+}
+.examples-title {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+.example {
+  background: #f3f0ff;
+  border-right: 4px solid #667eea;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+  direction: ltr;
+  color: #333;
+}
+.tip {
+  background: #fff8e1;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.88rem;
+  color: #7c4700;
+  margin-top: 0.75rem;
+  direction: ltr;
+}
+.tip::before { content: "💡 "; }
+
+.not-found {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  display: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+.not-found .emoji { font-size: 3rem; margin-bottom: 0.5rem; }
+
+/* Words grid */
+.words-section {
+  background: white;
+  border-radius: 20px;
+  padding: 1.2rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+.words-title {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+.words-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.5rem;
+}
+.word-card {
+  background: linear-gradient(135deg, #f3f0ff, #fdf4ff);
+  border: 2px solid #e9d5ff;
+  border-radius: 12px;
+  padding: 0.6rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.word-card:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102,126,234,0.2);
+}
+.word-card .wc-emoji { font-size: 1.4rem; }
+.word-card .wc-ar { font-size: 0.85rem; font-weight: 700; color: #333; }
+.word-card .wc-en { font-size: 0.75rem; color: #667eea; direction: ltr; }
+
+footer {
+  text-align: center;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.75rem;
+  padding: 1rem 0;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo">📚✨</div>
+    <h1>Translate & Learn</h1>
+    <p class="sub">تعلّمي الإنجليزية بطريقة ممتعة!</p>
+  </header>
+
+  <div class="search-box">
+    <div class="search-row">
+      <input id="inp" type="text" placeholder="ابحثي عن كلمة بالعربي أو الإنجليزي..." />
+      <button class="btn-search" onclick="search()">🔍</button>
+    </div>
+    <div class="categories" id="cats"></div>
+  </div>
+
+  <div class="result-card" id="result">
+    <div class="result-emoji" id="rEmoji"></div>
+    <div class="result-en" id="rEn"></div>
+    <div class="result-pron" id="rPron"></div>
+    <button onclick="speak()" style="
+      background:linear-gradient(135deg,#667eea,#764ba2);
+      color:white;border:none;border-radius:100px;
+      padding:8px 22px;font-size:1rem;cursor:pointer;
+      margin:0.5rem auto;display:block;font-family:inherit;
+    ">🔊 استمعي للكلمة</button>
+    <div class="result-ar" id="rAr"></div>
+    <div id="rEx" style="margin-top:0.8rem;"></div>
+  </div>
+
+  <div class="not-found" id="notFound">
+    <div class="emoji">🤔</div>
+    <div style="font-size:1rem;color:#666">ما وجدنا هذه الكلمة، جربي كلمة أخرى!</div>
+  </div>
+
+  <div class="words-section">
+    <div class="words-title" id="gridTitle">📖 جميع الكلمات</div>
+    <div class="words-grid" id="grid"></div>
+  </div>
+
+  <footer>
+  <div style="font-size:0.9rem;color:rgba(255,255,255,0.9);font-weight:700;margin-bottom:4px;">تصميم المعلمة : اثير البحيري</div>
+  <div style="font-size:0.8rem;color:rgba(255,255,255,0.7);margin-bottom:6px;">ثانوية الابناء الاولى</div>
+  <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);">Translate & Learn · ELO National 2026</div>
+</footer>
+</div>
+
+<script>
+const dictionary = [
+  // 🐾 حيوانات
+  {ar:"قطة",en:"Cat",pron:"/kæt/",emoji:"🐱",cat:"حيوانات",ex:["I have a cat.","The cat is sleeping.","My cat is white."],tip:"Think of CAT like the letters C-A-T"},
+  {ar:"كلب",en:"Dog",pron:"/dɒɡ/",emoji:"🐶",cat:"حيوانات",ex:["I love my dog.","The dog is big.","My dog runs fast."],tip:"DOG is a loyal friend!"},
+  {ar:"أسد",en:"Lion",pron:"/ˈlaɪən/",emoji:"🦁",cat:"حيوانات",ex:["The lion is strong.","Lions live in Africa.","A lion roared loudly."],tip:"The LION is the king of the jungle"},
+  {ar:"فيل",en:"Elephant",pron:"/ˈɛlɪfənt/",emoji:"🐘",cat:"حيوانات",ex:["The elephant is huge.","Elephants have big ears.","I saw an elephant at the zoo."],tip:"Elephants never forget!"},
+  {ar:"قرد",en:"Monkey",pron:"/ˈmʌŋki/",emoji:"🐒",cat:"حيوانات",ex:["The monkey climbs trees.","Monkeys eat bananas.","I like monkeys."],tip:"MONKEYs love to swing!"},
+  {ar:"أرنب",en:"Rabbit",pron:"/ˈræbɪt/",emoji:"🐰",cat:"حيوانات",ex:["The rabbit is white.","Rabbits eat carrots.","My rabbit is soft."],tip:"RABBITs have long ears"},
+  {ar:"بقرة",en:"Cow",pron:"/kaʊ/",emoji:"🐄",cat:"حيوانات",ex:["The cow gives milk.","I see a brown cow.","Cows eat grass."],tip:"COW gives us milk"},
+  {ar:"دجاجة",en:"Chicken",pron:"/ˈtʃɪkɪn/",emoji:"🐔",cat:"حيوانات",ex:["The chicken lays eggs.","We have a chicken.","Chickens are birds."],tip:"CHICKEN gives us eggs"},
+  {ar:"سمكة",en:"Fish",pron:"/fɪʃ/",emoji:"🐠",cat:"حيوانات",ex:["I have a fish.","The fish swims fast.","Fish live in water."],tip:"FISH live in water"},
+  {ar:"طائر",en:"Bird",pron:"/bɜːrd/",emoji:"🐦",cat:"حيوانات",ex:["The bird sings.","Birds can fly.","I see a colorful bird."],tip:"BIRDs can fly in the sky"},
+  {ar:"فراشة",en:"Butterfly",pron:"/ˈbʌtəflaɪ/",emoji:"🦋",cat:"حيوانات",ex:["The butterfly is beautiful.","Butterflies have colorful wings.","I caught a butterfly."],tip:"BUTTERFLY has beautiful wings"},
+  {ar:"نحلة",en:"Bee",pron:"/biː/",emoji:"🐝",cat:"حيوانات",ex:["The bee makes honey.","Bees are small.","Bees live in hives."],tip:"BEE makes sweet honey"},
+  {ar:"حصان",en:"Horse",pron:"/hɔːrs/",emoji:"🐴",cat:"حيوانات",ex:["The horse runs fast.","I ride a horse.","Horses are beautiful animals."],tip:"HORSE is fast and strong"},
+  {ar:"خروف",en:"Sheep",pron:"/ʃiːp/",emoji:"🐑",cat:"حيوانات",ex:["The sheep is white.","Sheep give us wool.","I see many sheep."],tip:"SHEEP gives us warm wool"},
+  {ar:"بطة",en:"Duck",pron:"/dʌk/",emoji:"🦆",cat:"حيوانات",ex:["The duck swims.","Ducks say quack.","I fed the duck."],tip:"DUCK says quack quack!"},
+
+  // 🍎 فواكه وخضروات
+  {ar:"تفاحة",en:"Apple",pron:"/ˈæpəl/",emoji:"🍎",cat:"طعام",ex:["I eat an apple.","The apple is red.","Apples are healthy."],tip:"An apple a day keeps the doctor away!"},
+  {ar:"موزة",en:"Banana",pron:"/bəˈnɑːnə/",emoji:"🍌",cat:"طعام",ex:["I like bananas.","The banana is yellow.","Monkeys love bananas."],tip:"BANANA is yellow and sweet"},
+  {ar:"برتقالة",en:"Orange",pron:"/ˈɒrɪndʒ/",emoji:"🍊",cat:"طعام",ex:["I drink orange juice.","The orange is sweet.","Oranges have vitamin C."],tip:"ORANGE is both a color and a fruit!"},
+  {ar:"فراولة",en:"Strawberry",pron:"/ˈstrɔːbəri/",emoji:"🍓",cat:"طعام",ex:["I love strawberries.","Strawberries are red.","Strawberry cake is delicious."],tip:"STRAWBERRYs are red and sweet"},
+  {ar:"عنب",en:"Grape",pron:"/ɡreɪp/",emoji:"🍇",cat:"طعام",ex:["I eat grapes.","Grapes are purple.","Grapes grow on vines."],tip:"GRAPEs grow in clusters"},
+  {ar:"بطيخ",en:"Watermelon",pron:"/ˈwɔːtəmɛlən/",emoji:"🍉",cat:"طعام",ex:["Watermelon is sweet.","I love watermelon.","Watermelon is red inside."],tip:"WATERMELONs are mostly water!"},
+  {ar:"خوخ",en:"Peach",pron:"/piːtʃ/",emoji:"🍑",cat:"طعام",ex:["The peach is soft.","Peaches are sweet.","I eat a peach."],tip:"PEACHes are soft and sweet"},
+  {ar:"ليمون",en:"Lemon",pron:"/ˈlɛmən/",emoji:"🍋",cat:"طعام",ex:["The lemon is sour.","I need a lemon.","Lemon tea is nice."],tip:"LEMONs are sour and yellow"},
+  {ar:"طماطم",en:"Tomato",pron:"/təˈmeɪtoʊ/",emoji:"🍅",cat:"طعام",ex:["I eat a tomato.","Tomatoes are red.","I like tomato soup."],tip:"TOMATO is a fruit used as a vegetable"},
+  {ar:"جزر",en:"Carrot",pron:"/ˈkærət/",emoji:"🥕",cat:"طعام",ex:["Rabbits eat carrots.","Carrots are orange.","I eat carrots for lunch."],tip:"CARROTs are good for your eyes"},
+  {ar:"خيار",en:"Cucumber",pron:"/ˈkjuːkʌmbər/",emoji:"🥒",cat:"طعام",ex:["I eat cucumber.","Cucumbers are green.","Cucumbers are cool and fresh."],tip:"CUCUMBERs are cool and green"},
+  {ar:"بصل",en:"Onion",pron:"/ˈʌnjən/",emoji:"🧅",cat:"طعام",ex:["Onions make me cry.","I cook with onions.","Onions are in my salad."],tip:"ONIONs can make you cry when cutting!"},
+  {ar:"بطاطا",en:"Potato",pron:"/pəˈteɪtoʊ/",emoji:"🥔",cat:"طعام",ex:["I love potatoes.","Potatoes are brown.","French fries are potatoes."],tip:"POTATOes make yummy fries"},
+  {ar:"خبز",en:"Bread",pron:"/brɛd/",emoji:"🍞",cat:"طعام",ex:["I eat bread.","Bread is soft.","I like fresh bread."],tip:"BREAD is a staple food"},
+  {ar:"حليب",en:"Milk",pron:"/mɪlk/",emoji:"🥛",cat:"طعام",ex:["I drink milk.","Milk is white.","Milk makes bones strong."],tip:"MILK gives you strong bones"},
+  {ar:"ماء",en:"Water",pron:"/ˈwɔːtər/",emoji:"💧",cat:"طعام",ex:["I drink water.","Water is important.","Drink more water!"],tip:"WATER is life!"},
+  {ar:"عصير",en:"Juice",pron:"/dʒuːs/",emoji:"🧃",cat:"طعام",ex:["I drink juice.","Apple juice is sweet.","I love orange juice."],tip:"JUICE is made from fruits"},
+  {ar:"كعكة",en:"Cake",pron:"/keɪk/",emoji:"🎂",cat:"طعام",ex:["I eat cake.","The cake is sweet.","Birthday cake is delicious."],tip:"CAKE is for celebrations!"},
+  {ar:"بيضة",en:"Egg",pron:"/ɛɡ/",emoji:"🥚",cat:"طعام",ex:["I eat an egg.","Eggs are healthy.","Chickens lay eggs."],tip:"EGGs are full of protein"},
+  {ar:"جبن",en:"Cheese",pron:"/tʃiːz/",emoji:"🧀",cat:"طعام",ex:["I love cheese.","Cheese is yellow.","Pizza has cheese."],tip:"CHEESEburgers are yummy!"},
+
+  // 🏠 المنزل
+  {ar:"باب",en:"Door",pron:"/dɔːr/",emoji:"🚪",cat:"منزل",ex:["Open the door.","The door is red.","Close the door please."],tip:"DOOR opens and closes"},
+  {ar:"نافذة",en:"Window",pron:"/ˈwɪndoʊ/",emoji:"🪟",cat:"منزل",ex:["Open the window.","The window is clean.","I look through the window."],tip:"WINDOW lets in light and air"},
+  {ar:"كرسي",en:"Chair",pron:"/tʃɛr/",emoji:"🪑",cat:"منزل",ex:["Sit on the chair.","The chair is comfortable.","I have a red chair."],tip:"CHAIR is for sitting"},
+  {ar:"طاولة",en:"Table",pron:"/ˈteɪbəl/",emoji:"🪵",cat:"منزل",ex:["The book is on the table.","We eat at the table.","The table is brown."],tip:"TABLE is where we eat and work"},
+  {ar:"سرير",en:"Bed",pron:"/bɛd/",emoji:"🛏️",cat:"منزل",ex:["I sleep in my bed.","My bed is soft.","Go to bed early."],tip:"BED is where we sleep"},
+  {ar:"مرآة",en:"Mirror",pron:"/ˈmɪrər/",emoji:"🪞",cat:"منزل",ex:["I look in the mirror.","The mirror is big.","The mirror is clean."],tip:"MIRROR shows your reflection"},
+  {ar:"ثلاجة",en:"Fridge",pron:"/frɪdʒ/",emoji:"🧊",cat:"منزل",ex:["The milk is in the fridge.","Open the fridge.","The fridge is cold."],tip:"FRIDGE keeps food cold"},
+  {ar:"مطبخ",en:"Kitchen",pron:"/ˈkɪtʃɪn/",emoji:"🍳",cat:"منزل",ex:["Mom cooks in the kitchen.","The kitchen smells good.","I help in the kitchen."],tip:"KITCHEN is where food is cooked"},
+  {ar:"حمام",en:"Bathroom",pron:"/ˈbæθruːm/",emoji:"🚿",cat:"منزل",ex:["I wash in the bathroom.","The bathroom is clean.","Brush teeth in the bathroom."],tip:"BATHROOMis for staying clean"},
+  {ar:"غرفة",en:"Room",pron:"/ruːm/",emoji:"🏠",cat:"منزل",ex:["My room is clean.","The room is big.","I play in my room."],tip:"ROOM is a space in a house"},
+
+  // 🏫 المدرسة
+  {ar:"كتاب",en:"Book",pron:"/bʊk/",emoji:"📚",cat:"مدرسة",ex:["I read a book.","The book is interesting.","My book is on the desk."],tip:"BOOK has pages with stories"},
+  {ar:"قلم",en:"Pen",pron:"/pɛn/",emoji:"🖊️",cat:"مدرسة",ex:["I write with a pen.","My pen is blue.","Can I borrow your pen?"],tip:"PEN writes in ink"},
+  {ar:"مسطرة",en:"Ruler",pron:"/ˈruːlər/",emoji:"📏",cat:"مدرسة",ex:["I use a ruler.","The ruler is 30cm.","Draw a line with a ruler."],tip:"RULER measures length"},
+  {ar:"مقص",en:"Scissors",pron:"/ˈsɪzərz/",emoji:"✂️",cat:"مدرسة",ex:["I cut with scissors.","Handle scissors carefully.","The scissors are sharp."],tip:"SCISSORS are for cutting"},
+  {ar:"حقيبة",en:"Bag",pron:"/bæɡ/",emoji:"🎒",cat:"مدرسة",ex:["My bag is heavy.","I carry my bag.","Put books in your bag."],tip:"BAG carries your things to school"},
+  {ar:"معلمة",en:"Teacher",pron:"/ˈtiːtʃər/",emoji:"👩‍🏫",cat:"مدرسة",ex:["My teacher is kind.","The teacher explains well.","I love my teacher."],tip:"TEACHER helps you learn"},
+  {ar:"طالبة",en:"Student",pron:"/ˈstjuːdənt/",emoji:"👧",cat:"مدرسة",ex:["I am a student.","She is a good student.","Students study hard."],tip:"STUDENTs go to school to learn"},
+  {ar:"فصل",en:"Classroom",pron:"/ˈklɑːsruːm/",emoji:"🏫",cat:"مدرسة",ex:["My classroom is big.","We learn in the classroom.","The classroom is clean."],tip:"CLASSROOM is where you learn"},
+  {ar:"سبورة",en:"Blackboard",pron:"/ˈblækbɔːrd/",emoji:"🖊️",cat:"مدرسة",ex:["The teacher writes on the blackboard.","I can see the blackboard.","Clean the blackboard."],tip:"BLACKBOARD is used by teachers"},
+  {ar:"واجب",en:"Homework",pron:"/ˈhoʊmwɜːrk/",emoji:"📝",cat:"مدرسة",ex:["I do my homework.","Homework is important.","I finish my homework."],tip:"HOMEWORK helps you practice"},
+
+  // 🌈 الألوان
+  {ar:"أحمر",en:"Red",pron:"/rɛd/",emoji:"🔴",cat:"ألوان",ex:["The apple is red.","I like red flowers.","She wears a red dress."],tip:"RED is the color of roses"},
+  {ar:"أزرق",en:"Blue",pron:"/bluː/",emoji:"🔵",cat:"ألوان",ex:["The sky is blue.","I have a blue pen.","Blue is my favorite color."],tip:"BLUE is the color of the sky"},
+  {ar:"أخضر",en:"Green",pron:"/ɡriːn/",emoji:"🟢",cat:"ألوان",ex:["Leaves are green.","I wear green.","Green means go!"],tip:"GREEN is the color of plants"},
+  {ar:"أصفر",en:"Yellow",pron:"/ˈjɛloʊ/",emoji:"🟡",cat:"ألوان",ex:["The sun is yellow.","Bananas are yellow.","I draw a yellow star."],tip:"YELLOW is the color of sunshine"},
+  {ar:"برتقالي",en:"Orange",pron:"/ˈɒrɪndʒ/",emoji:"🟠",cat:"ألوان",ex:["Oranges are orange.","I like orange color.","The sunset is orange."],tip:"ORANGE fruit and color have the same name!"},
+  {ar:"بنفسجي",en:"Purple",pron:"/ˈpɜːrpəl/",emoji:"🟣",cat:"ألوان",ex:["Grapes are purple.","She has a purple bag.","Purple is a royal color."],tip:"PURPLE is a mix of red and blue"},
+  {ar:"وردي",en:"Pink",pron:"/pɪŋk/",emoji:"🌸",cat:"ألوان",ex:["Roses are pink.","She wears pink.","I love pink color."],tip:"PINK is a soft lovely color"},
+  {ar:"أبيض",en:"White",pron:"/waɪt/",emoji:"⬜",cat:"ألوان",ex:["Snow is white.","My shirt is white.","Clouds are white."],tip:"WHITE is the color of snow"},
+  {ar:"أسود",en:"Black",pron:"/blæk/",emoji:"⬛",cat:"ألوان",ex:["The night is black.","My cat is black.","I use a black pen."],tip:"BLACK is the darkest color"},
+  {ar:"بني",en:"Brown",pron:"/braʊn/",emoji:"🟫",cat:"ألوان",ex:["Chocolate is brown.","My hair is brown.","The tree is brown."],tip:"BROWN is the color of chocolate"},
+
+  // 🌦️ الطقس والطبيعة
+  {ar:"شمس",en:"Sun",pron:"/sʌn/",emoji:"☀️",cat:"طبيعة",ex:["The sun is bright.","The sun rises in the east.","I love sunny days."],tip:"SUN gives us light and warmth"},
+  {ar:"قمر",en:"Moon",pron:"/muːn/",emoji:"🌙",cat:"طبيعة",ex:["The moon is round.","The moon shines at night.","I see the moon."],tip:"MOON shines at night"},
+  {ar:"نجمة",en:"Star",pron:"/stɑːr/",emoji:"⭐",cat:"طبيعة",ex:["The star is bright.","I see many stars.","Stars are far away."],tip:"STARs twinkle in the night sky"},
+  {ar:"سحابة",en:"Cloud",pron:"/klaʊd/",emoji:"☁️",cat:"طبيعة",ex:["The cloud is white.","I see dark clouds.","Clouds bring rain."],tip:"CLOUDs float in the sky"},
+  {ar:"مطر",en:"Rain",pron:"/reɪn/",emoji:"🌧️",cat:"طبيعة",ex:["I love rain.","Rain makes plants grow.","It rains today."],tip:"RAIN falls from clouds"},
+  {ar:"ثلج",en:"Snow",pron:"/snoʊ/",emoji:"❄️",cat:"طبيعة",ex:["Snow is cold.","Children play in snow.","Snow is white."],tip:"SNOW is frozen water that falls from the sky"},
+  {ar:"ريح",en:"Wind",pron:"/wɪnd/",emoji:"💨",cat:"طبيعة",ex:["The wind is strong.","Wind moves the trees.","I feel the cool wind."],tip:"WIND is moving air"},
+  {ar:"شجرة",en:"Tree",pron:"/triː/",emoji:"🌳",cat:"طبيعة",ex:["The tree is tall.","Trees give us oxygen.","I climb the tree."],tip:"TREE has roots, trunk and leaves"},
+  {ar:"زهرة",en:"Flower",pron:"/ˈflaʊər/",emoji:"🌸",cat:"طبيعة",ex:["The flower is beautiful.","I smell the flower.","Flowers grow in gardens."],tip:"FLOWERs are nature's decorations"},
+  {ar:"بحر",en:"Sea",pron:"/siː/",emoji:"🌊",cat:"طبيعة",ex:["The sea is blue.","I swim in the sea.","The sea is deep."],tip:"SEA is full of water and fish"},
+  {ar:"جبل",en:"Mountain",pron:"/ˈmaʊntɪn/",emoji:"⛰️",cat:"طبيعة",ex:["The mountain is high.","I climb the mountain.","Mountains are beautiful."],tip:"MOUNTAINs are very tall and majestic"},
+
+  // 👨‍👩‍👧 العائلة
+  {ar:"أمي",en:"Mother",pron:"/ˈmʌðər/",emoji:"👩",cat:"عائلة",ex:["I love my mother.","My mother is kind.","Mother cooks for us."],tip:"MOTHER is the most important person"},
+  {ar:"أبي",en:"Father",pron:"/ˈfɑːðər/",emoji:"👨",cat:"عائلة",ex:["My father is strong.","Father works hard.","I love my father."],tip:"FATHER takes care of the family"},
+  {ar:"أخ",en:"Brother",pron:"/ˈbrʌðər/",emoji:"👦",cat:"عائلة",ex:["My brother is funny.","I play with my brother.","My brother is older."],tip:"BROTHER is a male sibling"},
+  {ar:"أخت",en:"Sister",pron:"/ˈsɪstər/",emoji:"👧",cat:"عائلة",ex:["My sister is kind.","I love my sister.","We are two sisters."],tip:"SISTER is a female sibling"},
+  {ar:"جدة",en:"Grandmother",pron:"/ˈɡrænmʌðər/",emoji:"👵",cat:"عائلة",ex:["My grandmother is sweet.","Grandmother tells stories.","I visit my grandmother."],tip:"GRANDMOTHER is your parent's mother"},
+  {ar:"جد",en:"Grandfather",pron:"/ˈɡrænfɑːðər/",emoji:"👴",cat:"عائلة",ex:["My grandfather is wise.","Grandfather plays with me.","I love my grandfather."],tip:"GRANDFATHER is your parent's father"},
+  {ar:"صديقة",en:"Friend",pron:"/frɛnd/",emoji:"👫",cat:"عائلة",ex:["She is my friend.","We are good friends.","My friend is funny."],tip:"FRIEND is someone you care about"},
+
+  // 🏃 أفعال وأنشطة
+  {ar:"يلعب",en:"Play",pron:"/pleɪ/",emoji:"🎮",cat:"أفعال",ex:["I play outside.","We play together.","I play every day."],tip:"PLAY is fun and important"},
+  {ar:"يأكل",en:"Eat",pron:"/iːt/",emoji:"🍽️",cat:"أفعال",ex:["I eat lunch.","We eat together.","Eat your vegetables!"],tip:"EAT to stay healthy"},
+  {ar:"يشرب",en:"Drink",pron:"/drɪŋk/",emoji:"🥤",cat:"أفعال",ex:["I drink water.","Drink your milk.","She drinks juice."],tip:"DRINK water to stay healthy"},
+  {ar:"ينام",en:"Sleep",pron:"/sliːp/",emoji:"😴",cat:"أفعال",ex:["I sleep at night.","Sleep early.","She sleeps well."],tip:"SLEEP is important for health"},
+  {ar:"يركض",en:"Run",pron:"/rʌn/",emoji:"🏃",cat:"أفعال",ex:["I run fast.","We run in the park.","She runs every morning."],tip:"RUN is great exercise"},
+  {ar:"يقرأ",en:"Read",pron:"/riːd/",emoji:"📖",cat:"أفعال",ex:["I read books.","Read every day.","She reads well."],tip:"READ to learn new things"},
+  {ar:"يكتب",en:"Write",pron:"/raɪt/",emoji:"✍️",cat:"أفعال",ex:["I write my name.","Write clearly.","She writes nicely."],tip:"WRITE to communicate"},
+  {ar:"يرسم",en:"Draw",pron:"/drɔː/",emoji:"🎨",cat:"أفعال",ex:["I draw a house.","She draws well.","Draw a flower."],tip:"DRAW to express creativity"},
+  {ar:"يغني",en:"Sing",pron:"/sɪŋ/",emoji:"🎤",cat:"أفعال",ex:["I sing a song.","She sings beautifully.","We sing together."],tip:"SING to express happiness"},
+  {ar:"يرقص",en:"Dance",pron:"/dæns/",emoji:"💃",cat:"أفعال",ex:["I dance every day.","She dances well.","We dance together."],tip:"DANCE to the music!"},
+  {ar:"يضحك",en:"Laugh",pron:"/lɑːf/",emoji:"😂",cat:"أفعال",ex:["I laugh a lot.","She laughs loudly.","We laugh together."],tip:"LAUGH is the best medicine"},
+  {ar:"يحب",en:"Love",pron:"/lʌv/",emoji:"❤️",cat:"أفعال",ex:["I love my family.","She loves cats.","We love ice cream."],tip:"LOVE is the most beautiful feeling"},
+
+  // 🔢 الأرقام
+  {ar:"واحد",en:"One",pron:"/wʌn/",emoji:"1️⃣",cat:"أرقام",ex:["I have one cat.","One plus one is two.","She has one sister."],tip:"ONE is the first number"},
+  {ar:"اثنان",en:"Two",pron:"/tuː/",emoji:"2️⃣",cat:"أرقام",ex:["I have two hands.","Two plus two is four.","She has two books."],tip:"TWO is the number of your hands"},
+  {ar:"ثلاثة",en:"Three",pron:"/θriː/",emoji:"3️⃣",cat:"أرقام",ex:["I have three cats.","Three is my lucky number.","She has three sisters."],tip:"THREE sounds like the letter 3"},
+  {ar:"أربعة",en:"Four",pron:"/fɔːr/",emoji:"4️⃣",cat:"أرقام",ex:["A dog has four legs.","Four seasons in a year.","I have four books."],tip:"FOUR legs like a dog or cat"},
+  {ar:"خمسة",en:"Five",pron:"/faɪv/",emoji:"5️⃣",cat:"أرقام",ex:["Five fingers on one hand.","I am five years old.","Five apples on the tree."],tip:"FIVE fingers on your hand"},
+  {ar:"ستة",en:"Six",pron:"/sɪks/",emoji:"6️⃣",cat:"أرقام",ex:["Six days of school.","I have six pencils.","Six flowers in a vase."],tip:"SIX comes after five"},
+  {ar:"سبعة",en:"Seven",pron:"/ˈsɛvən/",emoji:"7️⃣",cat:"أرقام",ex:["Seven days in a week.","I have seven books.","Seven colors in a rainbow."],tip:"SEVEN colors in a rainbow"},
+  {ar:"ثمانية",en:"Eight",pron:"/eɪt/",emoji:"8️⃣",cat:"أرقام",ex:["Eight legs on a spider.","I am eight years old.","Eight apples in a basket."],tip:"EIGHT legs like a spider"},
+  {ar:"تسعة",en:"Nine",pron:"/naɪn/",emoji:"9️⃣",cat:"أرقام",ex:["Nine cats on the roof.","Nine is my lucky number.","I have nine stickers."],tip:"NINE comes before ten"},
+  {ar:"عشرة",en:"Ten",pron:"/tɛn/",emoji:"🔟",cat:"أرقام",ex:["Ten fingers in total.","I count to ten.","Ten students in class."],tip:"TEN fingers total on both hands"},
+
+  // 👗 ملابس
+  {ar:"قميص",en:"Shirt",pron:"/ʃɜːrt/",emoji:"👕",cat:"ملابس",ex:["I wear a shirt.","My shirt is blue.","She has a nice shirt."],tip:"SHIRT covers your upper body"},
+  {ar:"بنطلون",en:"Pants",pron:"/pænts/",emoji:"👖",cat:"ملابس",ex:["I wear pants.","My pants are black.","She wears blue pants."],tip:"PANTS cover your legs"},
+  {ar:"فستان",en:"Dress",pron:"/drɛs/",emoji:"👗",cat:"ملابس",ex:["She wears a dress.","The dress is pink.","I like her dress."],tip:"DRESS is worn by girls"},
+  {ar:"حذاء",en:"Shoe",pron:"/ʃuː/",emoji:"👟",cat:"ملابس",ex:["I wear shoes.","My shoes are white.","Clean your shoes."],tip:"SHOEs protect your feet"},
+  {ar:"جوارب",en:"Socks",pron:"/sɒks/",emoji:"🧦",cat:"ملابس",ex:["I wear socks.","My socks are warm.","She has colorful socks."],tip:"SOCKS keep your feet warm"},
+  {ar:"قبعة",en:"Hat",pron:"/hæt/",emoji:"🧢",cat:"ملابس",ex:["I wear a hat.","The hat is red.","She has a nice hat."],tip:"HAT goes on your head"},
+  {ar:"معطف",en:"Coat",pron:"/koʊt/",emoji:"🧥",cat:"ملابس",ex:["I wear a coat.","The coat is warm.","She has a long coat."],tip:"COAT keeps you warm in winter"},
+  {ar:"حقيبة يد",en:"Handbag",pron:"/ˈhændbæɡ/",emoji:"👜",cat:"ملابس",ex:["She has a handbag.","The handbag is brown.","I like her handbag."],tip:"HANDBAG carries personal items"},
+  {ar:"نظارة",en:"Glasses",pron:"/ˈɡlɑːsɪz/",emoji:"👓",cat:"ملابس",ex:["She wears glasses.","My glasses are new.","Glasses help you see."],tip:"GLASSES help you see clearly"},
+  {ar:"ساعة",en:"Watch",pron:"/wɒtʃ/",emoji:"⌚",cat:"ملابس",ex:["I wear a watch.","My watch is gold.","She checks her watch."],tip:"WATCH shows you the time"},
+
+  // 🚗 مواصلات
+  {ar:"سيارة",en:"Car",pron:"/kɑːr/",emoji:"🚗",cat:"مواصلات",ex:["I ride in a car.","The car is fast.","My car is red."],tip:"CAR has four wheels"},
+  {ar:"حافلة",en:"Bus",pron:"/bʌs/",emoji:"🚌",cat:"مواصلات",ex:["I take the bus.","The bus is yellow.","The bus stops here."],tip:"BUS carries many people"},
+  {ar:"طائرة",en:"Airplane",pron:"/ˈɛrpleɪn/",emoji:"✈️",cat:"مواصلات",ex:["I fly in an airplane.","The airplane is big.","Airplanes fly high."],tip:"AIRPLANE flies in the sky"},
+  {ar:"قطار",en:"Train",pron:"/treɪn/",emoji:"🚂",cat:"مواصلات",ex:["I ride the train.","The train is fast.","Trains run on tracks."],tip:"TRAIN runs on railway tracks"},
+  {ar:"دراجة",en:"Bicycle",pron:"/ˈbaɪsɪkəl/",emoji:"🚲",cat:"مواصلات",ex:["I ride my bicycle.","My bicycle is blue.","I love riding bicycles."],tip:"BICYCLE has two wheels"},
+  {ar:"سفينة",en:"Ship",pron:"/ʃɪp/",emoji:"🚢",cat:"مواصلات",ex:["The ship is big.","Ships sail on the sea.","I see a big ship."],tip:"SHIP sails on water"},
+  {ar:"مترو",en:"Metro",pron:"/ˈmɛtroʊ/",emoji:"🚇",cat:"مواصلات",ex:["I take the metro.","The metro is fast.","Metro runs underground."],tip:"METRO is an underground train"},
+  {ar:"تاكسي",en:"Taxi",pron:"/ˈtæksi/",emoji:"🚕",cat:"مواصلات",ex:["I take a taxi.","The taxi is yellow.","Call a taxi please."],tip:"TAXI takes you anywhere you want"},
+  {ar:"شاحنة",en:"Truck",pron:"/trʌk/",emoji:"🚛",cat:"مواصلات",ex:["The truck is big.","Trucks carry heavy things.","I see a red truck."],tip:"TRUCK carries heavy loads"},
+  {ar:"مروحية",en:"Helicopter",pron:"/ˈhɛlɪkɒptər/",emoji:"🚁",cat:"مواصلات",ex:["The helicopter flies.","Helicopters have blades.","I see a helicopter."],tip:"HELICOPTER can hover in the air"},
+
+  // 🎮 ألعاب وترفيه
+  {ar:"كرة",en:"Ball",pron:"/bɔːl/",emoji:"⚽",cat:"ألعاب",ex:["I kick the ball.","The ball is round.","We play with a ball."],tip:"BALL is round and fun to play with"},
+  {ar:"لعبة",en:"Toy",pron:"/tɔɪ/",emoji:"🧸",cat:"ألعاب",ex:["I have a toy.","My toy is nice.","She loves her toys."],tip:"TOY is for playing and fun"},
+  {ar:"دمية",en:"Doll",pron:"/dɒl/",emoji:"👧",cat:"ألعاب",ex:["I have a doll.","My doll is pretty.","She plays with dolls."],tip:"DOLL is a toy that looks like a person"},
+  {ar:"موسيقى",en:"Music",pron:"/ˈmjuːzɪk/",emoji:"🎵",cat:"ألعاب",ex:["I love music.","Music is beautiful.","She plays music."],tip:"MUSIC makes you happy"},
+  {ar:"رسم",en:"Drawing",pron:"/ˈdrɔːɪŋ/",emoji:"🎨",cat:"ألعاب",ex:["I love drawing.","Drawing is fun.","She draws well."],tip:"DRAWING expresses your creativity"},
+  {ar:"سباحة",en:"Swimming",pron:"/ˈswɪmɪŋ/",emoji:"🏊",cat:"ألعاب",ex:["I love swimming.","Swimming is healthy.","She swims fast."],tip:"SWIMMING is great exercise"},
+  {ar:"كرة قدم",en:"Football",pron:"/ˈfʊtbɔːl/",emoji:"⚽",cat:"ألعاب",ex:["I play football.","Football is exciting.","We win the football game."],tip:"FOOTBALL is the most popular sport"},
+  {ar:"كتاب قصص",en:"Storybook",pron:"/ˈstɔːribʊk/",emoji:"📖",cat:"ألعاب",ex:["I read a storybook.","Storybooks are fun.","My storybook has pictures."],tip:"STORYBOOK takes you to a new world"},
+  {ar:"ألوان تلوين",en:"Crayons",pron:"/ˈkreɪɒnz/",emoji:"🖍️",cat:"ألعاب",ex:["I color with crayons.","My crayons are bright.","She has many crayons."],tip:"CRAYONS make colorful drawings"},
+  {ar:"ألغاز",en:"Puzzle",pron:"/ˈpʌzəl/",emoji:"🧩",cat:"ألعاب",ex:["I solve a puzzle.","Puzzles are fun.","She loves puzzles."],tip:"PUZZLE challenges your brain"},
+
+  // 💪 الجسم
+  {ar:"رأس",en:"Head",pron:"/hɛd/",emoji:"🧠",cat:"جسم",ex:["I have a head.","My head hurts.","Use your head!"],tip:"HEAD is on top of your body"},
+  {ar:"عين",en:"Eye",pron:"/aɪ/",emoji:"👁️",cat:"جسم",ex:["I have two eyes.","My eyes are brown.","Close your eyes."],tip:"EYEs help you see the world"},
+  {ar:"أنف",en:"Nose",pron:"/noʊz/",emoji:"👃",cat:"جسم",ex:["I smell with my nose.","My nose is small.","She has a cute nose."],tip:"NOSE helps you smell things"},
+  {ar:"فم",en:"Mouth",pron:"/maʊθ/",emoji:"👄",cat:"جسم",ex:["I eat with my mouth.","Open your mouth.","She has a nice smile."],tip:"MOUTH is for eating and talking"},
+  {ar:"أذن",en:"Ear",pron:"/ɪər/",emoji:"👂",cat:"جسم",ex:["I hear with my ears.","My ears are small.","Listen with your ears."],tip:"EARs help you hear sounds"},
+  {ar:"يد",en:"Hand",pron:"/hænd/",emoji:"✋",cat:"جسم",ex:["I have two hands.","My hands are clean.","Wash your hands."],tip:"HANDs are used for touching and holding"},
+  {ar:"قدم",en:"Foot",pron:"/fʊt/",emoji:"🦶",cat:"جسم",ex:["I have two feet.","My feet are small.","Wash your feet."],tip:"FEET help you walk and run"},
+  {ar:"شعر",en:"Hair",pron:"/hɛr/",emoji:"💇",cat:"جسم",ex:["My hair is long.","She has black hair.","Brush your hair."],tip:"HAIR grows on your head"},
+  {ar:"أسنان",en:"Teeth",pron:"/tiːθ/",emoji:"🦷",cat:"جسم",ex:["Brush your teeth.","My teeth are white.","Teeth help you chew."],tip:"TEETH help you eat food"},
+  {ar:"قلب",en:"Heart",pron:"/hɑːrt/",emoji:"❤️",cat:"جسم",ex:["My heart beats fast.","I love with my heart.","The heart pumps blood."],tip:"HEART pumps blood through your body"},
+
+  // 👗 الملابس
+  {ar:"قميص",en:"Shirt",pron:"/ʃɜːrt/",emoji:"👕",cat:"ملابس",ex:["I wear a shirt.","My shirt is blue.","She has a nice shirt."],tip:"SHIRT is worn on your upper body"},
+  {ar:"بنطلون",en:"Pants",pron:"/pænts/",emoji:"👖",cat:"ملابس",ex:["I wear pants.","My pants are black.","She bought new pants."],tip:"PANTS cover your legs"},
+  {ar:"فستان",en:"Dress",pron:"/drɛs/",emoji:"👗",cat:"ملابس",ex:["She wears a dress.","The dress is pink.","I love my new dress."],tip:"DRESS is a nice outfit for girls"},
+  {ar:"حذاء",en:"Shoe",pron:"/ʃuː/",emoji:"👟",cat:"ملابس",ex:["I wear shoes.","My shoes are white.","Put on your shoes."],tip:"SHOES protect your feet"},
+  {ar:"جوارب",en:"Socks",pron:"/sɒks/",emoji:"🧦",cat:"ملابس",ex:["I wear socks.","My socks are colorful.","Put on your socks."],tip:"SOCKS keep your feet warm"},
+  {ar:"معطف",en:"Coat",pron:"/koʊt/",emoji:"🧥",cat:"ملابس",ex:["I wear a coat.","The coat is warm.","Wear your coat outside."],tip:"COAT keeps you warm in winter"},
+  {ar:"قبعة",en:"Hat",pron:"/hæt/",emoji:"🎩",cat:"ملابس",ex:["I wear a hat.","The hat is red.","She has a funny hat."],tip:"HAT goes on your head"},
+  {ar:"شال",en:"Scarf",pron:"/skɑːrf/",emoji:"🧣",cat:"ملابس",ex:["I wear a scarf.","The scarf is warm.","She has a colorful scarf."],tip:"SCARF keeps your neck warm"},
+  {ar:"قفازات",en:"Gloves",pron:"/ɡlʌvz/",emoji:"🧤",cat:"ملابس",ex:["I wear gloves.","Gloves keep hands warm.","She has pink gloves."],tip:"GLOVES keep your hands warm"},
+  {ar:"نظارة",en:"Glasses",pron:"/ˈɡlɑːsɪz/",emoji:"👓",cat:"ملابس",ex:["She wears glasses.","Glasses help you see.","My glasses are round."],tip:"GLASSES help you see better"},
+
+  // 🚗 المواصلات
+  {ar:"سيارة",en:"Car",pron:"/kɑːr/",emoji:"🚗",cat:"مواصلات",ex:["I ride in a car.","The car is fast.","My dad drives a car."],tip:"CAR has four wheels"},
+  {ar:"حافلة",en:"Bus",pron:"/bʌs/",emoji:"🚌",cat:"مواصلات",ex:["I take the bus.","The bus is yellow.","The school bus is here."],tip:"BUS carries many people"},
+  {ar:"قطار",en:"Train",pron:"/treɪn/",emoji:"🚆",cat:"مواصلات",ex:["I ride the train.","The train is fast.","The train has many seats."],tip:"TRAIN runs on tracks"},
+  {ar:"طائرة",en:"Airplane",pron:"/ˈɛrpleɪn/",emoji:"✈️",cat:"مواصلات",ex:["I fly in an airplane.","The airplane is big.","Airplanes fly high."],tip:"AIRPLANE flies in the sky"},
+  {ar:"دراجة",en:"Bicycle",pron:"/ˈbaɪsɪkəl/",emoji:"🚲",cat:"مواصلات",ex:["I ride a bicycle.","My bicycle is red.","Riding a bicycle is fun."],tip:"BICYCLE has two wheels"},
+  {ar:"سفينة",en:"Ship",pron:"/ʃɪp/",emoji:"🚢",cat:"مواصلات",ex:["The ship is big.","Ships sail on the sea.","I see a big ship."],tip:"SHIP travels on water"},
+  {ar:"دراجة نارية",en:"Motorcycle",pron:"/ˈmoʊtərsaɪkəl/",emoji:"🏍️",cat:"مواصلات",ex:["He rides a motorcycle.","The motorcycle is loud.","Motorcycles are fast."],tip:"MOTORCYCLE has two wheels and an engine"},
+  {ar:"سيارة إسعاف",en:"Ambulance",pron:"/ˈæmbjʊləns/",emoji:"🚑",cat:"مواصلات",ex:["The ambulance is fast.","Call an ambulance!","The ambulance helps sick people."],tip:"AMBULANCE rushes sick people to hospital"},
+  {ar:"سيارة إطفاء",en:"Fire truck",pron:"/faɪər trʌk/",emoji:"🚒",cat:"مواصلات",ex:["The fire truck is red.","Fire trucks put out fires.","I hear the fire truck."],tip:"FIRE TRUCK puts out fires"},
+  {ar:"تاكسي",en:"Taxi",pron:"/ˈtæksi/",emoji:"🚕",cat:"مواصلات",ex:["I take a taxi.","The taxi is yellow.","Call a taxi please."],tip:"TAXI takes you where you want to go"},
+
+  // 🎨 الأدوات والأشياء
+  {ar:"مفتاح",en:"Key",pron:"/kiː/",emoji:"🔑",cat:"أشياء",ex:["I have a key.","The key opens the door.","She lost her key."],tip:"KEY opens locks"},
+  {ar:"هاتف",en:"Phone",pron:"/foʊn/",emoji:"📱",cat:"أشياء",ex:["I use my phone.","The phone is new.","She calls on the phone."],tip:"PHONE lets you talk to people far away"},
+  {ar:"حاسوب",en:"Computer",pron:"/kəmˈpjuːtər/",emoji:"💻",cat:"أشياء",ex:["I use a computer.","The computer is fast.","I learn on the computer."],tip:"COMPUTER helps us work and learn"},
+  {ar:"تلفاز",en:"Television",pron:"/ˈtɛlɪvɪʒən/",emoji:"📺",cat:"أشياء",ex:["I watch television.","The television is big.","I like watching TV."],tip:"TELEVISION shows pictures and sound"},
+  {ar:"ساعة",en:"Clock",pron:"/klɒk/",emoji:"🕐",cat:"أشياء",ex:["I look at the clock.","The clock shows time.","The clock is on the wall."],tip:"CLOCK tells you the time"},
+  {ar:"مصباح",en:"Lamp",pron:"/læmp/",emoji:"💡",cat:"أشياء",ex:["I turn on the lamp.","The lamp is bright.","The lamp lights the room."],tip:"LAMP gives light in dark rooms"},
+  {ar:"مظلة",en:"Umbrella",pron:"/ʌmˈbrɛlə/",emoji:"☂️",cat:"أشياء",ex:["I use an umbrella.","The umbrella is colorful.","Take your umbrella, it's raining!"],tip:"UMBRELLA keeps you dry in rain"},
+  {ar:"حقيبة يد",en:"Purse",pron:"/pɜːrs/",emoji:"👜",cat:"أشياء",ex:["She has a purse.","The purse is pink.","Mom carries a purse."],tip:"PURSE carries money and things"},
+  {ar:"كرة",en:"Ball",pron:"/bɔːl/",emoji:"⚽",cat:"أشياء",ex:["I kick the ball.","The ball is round.","We play with a ball."],tip:"BALL is round and used in sports"},
+  {ar:"لعبة",en:"Toy",pron:"/tɔɪ/",emoji:"🧸",cat:"أشياء",ex:["I play with my toy.","The toy is fun.","She has many toys."],tip:"TOY is something children play with"},
+
+  // 💪 الجسم
+  {ar:"رأس",en:"Head",pron:"/hɛd/",emoji:"🗣️",cat:"جسم",ex:["My head hurts.","She nods her head.","Put the hat on your head."],tip:"HEAD is the top of your body"},
+  {ar:"عين",en:"Eye",pron:"/aɪ/",emoji:"👁️",cat:"جسم",ex:["I have two eyes.","Her eyes are brown.","Close your eyes."],tip:"EYES help you see the world"},
+  {ar:"أنف",en:"Nose",pron:"/noʊz/",emoji:"👃",cat:"جسم",ex:["I smell with my nose.","Her nose is small.","My nose is cold."],tip:"NOSE helps you smell things"},
+  {ar:"فم",en:"Mouth",pron:"/maʊθ/",emoji:"👄",cat:"جسم",ex:["I eat with my mouth.","Open your mouth.","She has a big smile."],tip:"MOUTH is for eating and talking"},
+  {ar:"أذن",en:"Ear",pron:"/ɪər/",emoji:"👂",cat:"جسم",ex:["I hear with my ears.","Her ears are small.","Listen carefully with your ears."],tip:"EARS help you hear sounds"},
+  {ar:"يد",en:"Hand",pron:"/hænd/",emoji:"✋",cat:"جسم",ex:["I wave my hand.","Wash your hands.","She has small hands."],tip:"HANDS help you touch and hold things"},
+  {ar:"قدم",en:"Foot",pron:"/fʊt/",emoji:"🦶",cat:"جسم",ex:["My foot hurts.","She has small feet.","Wash your feet."],tip:"FEET help you walk and run"},
+  {ar:"شعر",en:"Hair",pron:"/hɛr/",emoji:"💇",cat:"جسم",ex:["Her hair is long.","I brush my hair.","She has black hair."],tip:"HAIR grows on your head"},
+  {ar:"أسنان",en:"Teeth",pron:"/tiːθ/",emoji:"🦷",cat:"جسم",ex:["I brush my teeth.","Her teeth are white.","Brush your teeth twice a day."],tip:"TEETH help you chew food"},
+  {ar:"قلب",en:"Heart",pron:"/hɑːrt/",emoji:"❤️",cat:"جسم",ex:["My heart beats fast.","I love with my heart.","The heart pumps blood."],tip:"HEART pumps blood through your body"},
+
+  // 🌍 أماكن
+  {ar:"مدرسة",en:"School",pron:"/skuːl/",emoji:"🏫",cat:"أماكن",ex:["I go to school.","School is fun.","I love my school."],tip:"SCHOOL is where you learn"},
+  {ar:"بيت",en:"House",pron:"/haʊs/",emoji:"🏠",cat:"أماكن",ex:["I live in a house.","My house is big.","The house is white."],tip:"HOUSE is your home"},
+  {ar:"مسجد",en:"Mosque",pron:"/mɒsk/",emoji:"🕌",cat:"أماكن",ex:["We pray at the mosque.","The mosque is beautiful.","I go to the mosque."],tip:"MOSQUE is a place of worship"},
+  {ar:"مستشفى",en:"Hospital",pron:"/ˈhɒspɪtəl/",emoji:"🏥",cat:"أماكن",ex:["Doctors work at the hospital.","I go to the hospital.","The hospital is clean."],tip:"HOSPITAL is where doctors help people"},
+  {ar:"حديقة",en:"Garden",pron:"/ˈɡɑːrdən/",emoji:"🌻",cat:"أماكن",ex:["I play in the garden.","The garden is beautiful.","Flowers grow in the garden."],tip:"GARDEN is full of beautiful plants"},
+  {ar:"سوق",en:"Market",pron:"/ˈmɑːrkɪt/",emoji:"🏪",cat:"أماكن",ex:["We shop at the market.","The market is busy.","I buy fruit at the market."],tip:"MARKET is where you buy and sell things"},
+  {ar:"مكتبة",en:"Library",pron:"/ˈlaɪbrəri/",emoji:"📚",cat:"أماكن",ex:["I read at the library.","The library is quiet.","I borrow books from the library."],tip:"LIBRARY is a place full of books"},
+];
+
+const categories = ["الكل", ...new Set(dictionary.map(w => w.cat))];
+let activeCat = "الكل";
+
+// Build category buttons
+const catsDiv = document.getElementById('cats');
+categories.forEach(c => {
+  const btn = document.createElement('button');
+  btn.className = 'cat-btn' + (c === 'الكل' ? ' active' : '');
+  btn.textContent = c;
+  btn.onclick = () => {
+    activeCat = c;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGrid(c);
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('notFound').style.display = 'none';
+  };
+  catsDiv.appendChild(btn);
+});
+
+function renderGrid(cat) {
+  const grid = document.getElementById('grid');
+  const title = document.getElementById('gridTitle');
+  const filtered = cat === 'الكل' ? dictionary : dictionary.filter(w => w.cat === cat);
+  title.textContent = `📖 ${cat === 'الكل' ? 'جميع الكلمات' : cat} (${filtered.length} كلمة)`;
+  grid.innerHTML = '';
+  filtered.forEach(w => {
+    const card = document.createElement('div');
+    card.className = 'word-card';
+    card.innerHTML = `<div class="wc-emoji">${w.emoji}</div><div class="wc-ar">${w.ar}</div><div class="wc-en">${w.en}</div>`;
+    card.onclick = () => showWord(w);
+    grid.appendChild(card);
+  });
+}
+
+function speak() {
+  const word = document.getElementById('rEn').textContent;
+  if (!word) return;
+  const utter = new SpeechSynthesisUtterance(word);
+  utter.lang = 'en-US';
+  utter.rate = 0.8;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+}
+
+function showWord(w) {
+  document.getElementById('rEmoji').textContent = w.emoji;
+  document.getElementById('rEn').textContent = w.en;
+  document.getElementById('rPron').textContent = w.pron;
+  document.getElementById('rAr').textContent = w.ar;
+
+  const exDiv = document.getElementById('rEx');
+  exDiv.innerHTML = '<div style="font-size:0.8rem;color:#888;font-weight:700;margin-bottom:0.4rem;direction:rtl;">📝 أمثلة:</div>';
+  w.ex.slice(0,2).forEach(e => {
+    const d = document.createElement('div');
+    d.style.cssText = 'background:#f3f0ff;border-right:4px solid #667eea;border-radius:8px;padding:0.6rem 0.8rem;font-size:0.9rem;margin-bottom:0.4rem;direction:ltr;color:#333;cursor:pointer;';
+    d.textContent = e;
+    d.title = 'اضغطي للاستماع';
+    d.onclick = () => {
+      const u = new SpeechSynthesisUtterance(e);
+      u.lang = 'en-US'; u.rate = 0.8;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    };
+    exDiv.appendChild(d);
+  });
+
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('notFound').style.display = 'none';
+  document.getElementById('result').scrollIntoView({behavior:'smooth', block:'nearest'});
+  const utter = new SpeechSynthesisUtterance(w.en);
+  utter.lang = 'en-US'; utter.rate = 0.8;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+}
+
+function search() {
+  const q = document.getElementById('inp').value.trim().toLowerCase();
+  if (!q) return;
+  const found = dictionary.find(w =>
+    w.ar.includes(q) || w.en.toLowerCase().includes(q)
+  );
+  if (found) {
+    showWord(found);
+  } else {
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('notFound').style.display = 'block';
+  }
+}
+
+document.getElementById('inp').addEventListener('keydown', e => {
+  if (e.key === 'Enter') search();
+});
+
+renderGrid('الكل');
+</script>
+</body>
+</html>
